@@ -18,8 +18,8 @@ long sum = 0;
 
 const char * inputfile = "input.txt";
 const char * outputfile = "output.txt"; 
-const char *splitter1 = "=";
-const char *splitter2 = "\n";
+const char * splitter1 = "=";
+const char * splitter2 = "\n";
 
 pthread_mutex_t Device_mutex;
 void *ret;
@@ -42,6 +42,7 @@ int main()
 	char *p1, *p2;
 	int i=0;
 	while(fgets(buf,MAX_BUFFER_SIZE,fp)){
+		if(i>=2)break;
 		p1 = strtok(buf,splitter1);
 		p2 = strtok(NULL,splitter2);
 		tmp[i++] = (unsigned long)strtoul(p2,NULL,10);
