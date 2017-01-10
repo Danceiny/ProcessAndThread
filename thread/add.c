@@ -48,6 +48,7 @@ int main()
 		tmp[i++] = (unsigned long)strtoul(p2,NULL,10);
 	}
 
+	// Set the parameters right
 	thread_number = (unsigned int)(tmp[0]<MAX_THREAD_COUNT ? tmp[0] : MAX_THREAD_COUNT);
 	if(tmp[1] > UINT_MAX)
 	{
@@ -64,7 +65,7 @@ int main()
 	pthread_t pthread[MAX_THREAD_COUNT];
 
 	// Create thread
-	for(i = 0 ;i < thread_number; i++)
+	for(i = 0; i < thread_number; i++)
 	{
 		printf("create the %uth thread~~~\n", i+1);
 		pthread_create(&pthread[i],NULL,add,NULL);
@@ -76,29 +77,36 @@ int main()
     return 0;
 }
 void *add(void *arg)
-{
+{ 
 	while(cur_number <= require_number)
     {
+		
 		pthread_mutex_lock(&Device_mutex);
+		cur_number++;
 		sum = sum + cur_number;
 		printf("the thread id = %u , the current num is %u,\tthe current sum is %ld\n" , syscall(SYS_gettid),cur_number,sum);		
-		cur_number++;
-		pthread_mutex_unlock(&Device_mutex);
-		usleep(100);	
-    }
-    if(cur_number > require_number)
-    {	
-    	char buf[MAX_BUFFER_SIZE];
-    	sprintf(buf,"%ld",sum);
-    	FILE *fp;
-		if((fp=fopen(outputfile,"w+"))==NULL)
+
+		if(cur_number == require_number)
 		{
-			printf("Sorry, I can not open the file! Please verify it~~~");
-			return -1;
+			char buf[MAX_BUFFER_SIZE];
+			sprintf(buf,"%ld",sum);
+			FILE *fp;
+			if((fp=fopen(outputfile,"w+"))==NULL)
+			{
+				printf("Sorry, I can not open the file! Please verify it~~~");
+				return -1;
+			}
+			fwrite(buf,strlen(buf),1,fp);
+			fflush(fp);
+			printf("write to file...\n");
+			fclose(fp);	
+			exit(0);//return 0; work uncorrectly: return will not quit the program
 		}
-		fwrite(buf,strlen(buf),1,fp);
-		fflush(fp);
-		printf("write to file...\n");
-		fclose(fp);
+		pthread_mutex_unlock(&Device_mutex);
+
+		usleep(100);	
+		
     }
+    if(cur_number > require_number) printf(">>>>>>>>>>>>\n");
+
 }

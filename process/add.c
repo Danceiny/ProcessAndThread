@@ -9,20 +9,20 @@
 #define MAX_BUFFER_SIZE 1024
 #define MAX_PROCESS_COUNT 99
 
-const char *inputfile = "input.txt";
-const char *outputfile = "output.txt";
-const char *splitter1 = "=";
-const char *splitter2 = "\n";
+const char * inputfile = "input.txt";
+const char * outputfile = "output.txt";
+const char * splitter1 = "=";
+const char * splitter2 = "\n";
 
-unsigned int cur_number = 0;
 unsigned int process_number = 5;
 unsigned int require_number = 20;
+unsigned int cur_number = 0;
 unsigned int loop = 0;
 
 
 struct msg_st
 {
-	long type;
+	long type;	// must be long int type
 	unsigned int cur;
 	long sum;
 };
@@ -71,7 +71,7 @@ int main()
 	data.sum = 0;
 	int msgid = -1;
 	msgid = msgget((key_t)1239,0666|IPC_CREAT|IPC_NOWAIT);
-	//msgid = msgget((key_t)1235,0666|IPC_CREAT);
+	//msgid = msgget((key_t)1235,0666|IPC_CREAT); //also work correctly
 	msgsnd(msgid,&data,sizeof(struct msg_st)-sizeof(long),0);	
 	pid_t fpid;
 
@@ -93,7 +93,7 @@ int main()
 				{
 					data.cur = require_number;
 					msgsnd(msgid,&data,sizeof(struct msg_st)-sizeof(long),0);					
-					return 0;	
+					return 0;	// cannot with exit
 				}
 
 				if(data.cur == require_number)
@@ -103,6 +103,7 @@ int main()
 					msgsnd(msgid,&data,sizeof(struct msg_st)-sizeof(long),0);
 					printf("the current number is %u,\tthe current sum is %ld\n",data.cur,data.sum);				
 					printf("the calculation is over...\n");
+					
 					// write the sum to a text file
 					char buf[MAX_BUFFER_SIZE];
 					sprintf(buf,"%ld",data.sum);
@@ -115,8 +116,7 @@ int main()
 					fwrite(buf,strlen(buf),1,fp);
 					fflush(fp);
 					fclose(fp);
-				
-					return 0;
+					return 0;	// cannot with exit
 				}
 
 				data.sum += data.cur;
