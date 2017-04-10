@@ -6,10 +6,17 @@
 You can check your environment, maybe like this:
 For Debian/Ubuntu
 ```
+gcc --version
+make --version
+```
+
+If get error, so you need to install them like this:
+```
 sudo apt-get install gcc
 sudo apt-get install make
 ```
-For other OS, you can google it.
+
+For other OS, you can google it. The Same question~
 
 # Quick start
 ## Multi-thread
